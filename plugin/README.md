@@ -54,7 +54,7 @@ git-kb init codex
 - one focused code-intelligence skill;
 - Codex lifecycle hooks that call `git-kb hook codex`;
 - MCP configuration for `git-kb mcp`;
-- no ATC-specific behavior;
+- no external harness-specific behavior;
 - no vendored copy of the full canonical `git-kb init codex` skill set.
 
 ## Documentation
