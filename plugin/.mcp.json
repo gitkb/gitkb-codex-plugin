@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "gitkb": {
+      "command": "git-kb",
+      "args": [
+        "mcp"
+      ]
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "gitkb",
+  "version": "0.1.0",
+  "description": "Codex hooks, skills, and MCP config for GitKB code-intelligence guidance.",
+  "author": {
+    "name": "GitKB",
+    "url": "https://gitkb.com"
+  },
+  "homepage": "https://gitkb.com/docs",
+  "repository": "https://github.com/gitkb/gitkb-codex-plugin",
+  "license": "MIT",
+  "keywords": [
+    "gitkb",
+    "codex",
+    "hooks",
+    "mcp",
+    "code-intelligence"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "GitKB",
+    "shortDescription": "GitKB code-intelligence guidance for Codex sessions.",
+    "longDescription": "Installs Codex hooks, a GitKB code-intelligence skill, and MCP configuration so Codex can prefer GitKB's AST-backed callers, callees, symbols, impact, and semantic tools when exploring code relationships.",
+    "developerName": "GitKB",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Find callers of this function with GitKB.",
+      "Assess this file's blast radius.",
+      "Find definitions and references for this symbol."
+    ]
+  }
+}
