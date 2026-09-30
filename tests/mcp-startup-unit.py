@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Negative controls for the shared real-Codex launch harness."""
 import importlib.util
-import json
 import os
 import subprocess
 import sys
@@ -88,6 +87,17 @@ class PayloadTests(unittest.TestCase):
                                         capture_output=True, text=True, timeout=10)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertIn("AssertionError", result.stderr)
+
+    def test_legacy_fixture_selects_one_entry_by_name(self):
+        """Adding another catalog entry must not silently change the upgrade control's target."""
+        other = {"name": "other", "source": {"source": "local", "path": "./other"}}
+        catalog = {"plugins": [other, {"name": "gitkb", "source": {"source": "git-subdir"}}]}
+        startup.use_legacy_source(catalog)
+        self.assertEqual(catalog["plugins"][0]["source"], {"source": "local", "path": "./other"})
+        self.assertEqual(catalog["plugins"][1]["source"], {"source": "local", "path": "./plugin"})
+        for entries in ([], [other], [{"name": "gitkb"}, {"name": "gitkb"}]):
+            with self.subTest(entries=entries), self.assertRaises(AssertionError):
+                startup.use_legacy_source({"plugins": entries})
 
 
 class ProtocolTests(unittest.TestCase):

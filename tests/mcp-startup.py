@@ -160,6 +160,14 @@ def check_context(observed, expected, label):
         raise AssertionError(f"{label}: expected {expected}, got {observed}")
 
 
+def use_legacy_source(catalog):
+    """Point exactly one named GitKB entry at the temporary legacy fixture."""
+    entries = [entry for entry in catalog["plugins"] if entry.get("name") == "gitkb"]
+    if len(entries) != 1:
+        raise AssertionError(f"Expected one gitkb catalog entry: {entries}")
+    entries[0]["source"] = {"source": "local", "path": "./plugin"}
+
+
 def main():
     """Verify session isolation and the credential boundary through a real package install."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -240,7 +248,7 @@ if sys.argv[1:] != ["mcp"]:
             mcp_path.write_text(json.dumps(mcp))
             target_catalog = Path(marketplace) / ".agents/plugins/marketplace.json"
             legacy_catalog = json.loads(target_catalog.read_text())
-            legacy_catalog["plugins"][0]["source"] = {"source": "local", "path": "./plugin"}
+            use_legacy_source(legacy_catalog)
             catalog_path.write_text(json.dumps(legacy_catalog))
             run(codex, ["plugin", "marketplace", "add", str(old_catalog), "--json"], base_env, root)
             legacy = json.loads(run(codex, ["plugin", "add", "gitkb@gitkb", "--json"], base_env, root))
