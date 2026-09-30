@@ -94,12 +94,18 @@ Keep the marketplace and plugin docs aligned when preparing a release.
 
 ## MCP Launch Regression Tests
 
-`make test` checks the packaged environment allowlist and cache version. The
+`make test` checks the packaged environment allowlist and cache version, and
+runs negative controls for cache symlinks, special files, executable modes,
+receipt path escapes, optimized Python, protocol failures, output limits, and
+process cleanup. Python 3.11 or newer is required for these test tools. The
 installation test exercises the actual Codex MCP launch boundary with synthetic
 sessions, custom registry settings, paths with spaces and Unicode, and credential
 canaries. It reuses an isolated plugin installation across two sessions and a
-launch without activity context. It does not start a model turn or run an activity
-sink, and it does not use your Codex home or credentials.
+launch without activity context. A second isolated run first installs a bundled
+`0.1.0` fixture, reproduces its missing context, then upgrades the same
+`gitkb@gitkb` installation and repeats those checks. The harness bounds protocol
+buffers and diagnostic reads, and terminates its own app-server process group.
+It does not start a model turn or run an activity sink, and it does not use your Codex home or credentials.
 
 ```bash
 make test-integration CODEX_TEST_BINARY=/absolute/path/to/provider/codex
