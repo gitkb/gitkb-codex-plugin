@@ -1,6 +1,10 @@
 # GitKB Codex Plugin
 
-This repository contains the GitKB marketplace plugin for Codex.
+This repository is the authoritative source for the GitKB Codex plugin payload
+and its package/MCP regression tests. The `gitkb/codex-plugins` marketplace references
+`./plugin` here through a Git-backed source; it does not maintain a plugin copy.
+Plugin behavior changes belong in this repository. Catalog release promotion only
+updates the marketplace's approved commit selector.
 
 GitKB gives Codex local code intelligence first: symbols, callers, callees, impact analysis, dead-code detection, semantic search, and service-edge queries through the `git-kb` CLI and MCP tools. Full GitKB setup adds the persistent knowledge graph for tasks, specs, decisions, architecture, and team sync.
 

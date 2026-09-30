@@ -5,6 +5,7 @@ Uses only initialize and mcpServerStatus/list; never starts a thread or model tu
 The fake GitKB server captures synthetic context without running an activity sink.
 """
 import argparse
+import hashlib
 import json
 import os
 import selectors
@@ -32,6 +33,7 @@ def run(codex, args, env, cwd):
                             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30)
     if result.returncode:
         raise AssertionError(f"Codex {args} failed: {result.stdout} {result.stderr}")
+    return result.stdout
 
 
 def inspect_child(codex, env, root, capture):
@@ -99,11 +101,20 @@ def inspect_child(codex, env, root, capture):
             process.stdout.close()
 
 
+def payload_fingerprint(root):
+    """Hash the package tree so source resolution cannot silently install another payload."""
+    return {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in root.rglob("*") if path.is_file()}
+
+
 def main():
     """Verify session isolation and the credential boundary through a real package install."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--codex", required=True, help="Provider Codex binary, not an ATC shim")
     parser.add_argument("--marketplace", default=".")
+    parser.add_argument("--expected-plugin-root", type=Path,
+                        default=Path(__file__).resolve().parents[1] / "plugin",
+                        help="Canonical package to compare with the installed cache")
     args = parser.parse_args()
     codex = shutil.which(args.codex)
     if not codex:
@@ -154,7 +165,17 @@ if sys.argv[1:] != ["mcp"]:
             # npm Codex launchers use /usr/bin/env node; keep that interpreter reachable.
             base_env["PATH"] += os.pathsep + str(Path(node).parent)
         run(codex, ["plugin", "marketplace", "add", marketplace, "--json"], base_env, root)
-        run(codex, ["plugin", "add", "gitkb@gitkb", "--json"], base_env, root)
+        receipt = json.loads(run(codex, ["plugin", "add", "gitkb@gitkb", "--json"], base_env, root))
+        expected_root = args.expected_plugin_root.resolve()
+        if not (expected_root / ".codex-plugin/plugin.json").is_file():
+            raise AssertionError(f"Missing canonical package: {expected_root}")
+        expected_payload = payload_fingerprint(expected_root)
+        actual_payload = payload_fingerprint(Path(receipt["installedPath"]))
+        if actual_payload != expected_payload:
+            changed = sorted(path for path in actual_payload.keys() | expected_payload.keys()
+                             if actual_payload.get(path) != expected_payload.get(path))
+            raise AssertionError(f"Installed payload differs from canonical source: {changed}")
+        print(f"PASS: installed canonical payload ({len(actual_payload)} files)")
         for session in ("alpha", "beta", None):
             expected = {} if session is None else dict(zip(NAMES, (
                 f"xses-{session}", "external", "codex",
