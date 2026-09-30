@@ -27,6 +27,7 @@ FORBIDDEN = ("MCP_ENV_UNRELATED_SECRET", "OPENAI_API_KEY", "ATC_SESSION_ID", "CO
 
 
 def run(codex, args, env, cwd):
+    """Run a bounded plugin installation command with only the fixture environment."""
     result = subprocess.run([codex, *args], env=env, cwd=cwd,
                             stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=30)
     if result.returncode:
@@ -34,6 +35,7 @@ def run(codex, args, env, cwd):
 
 
 def inspect_child(codex, env, root, capture):
+    """Negotiate packaged MCP tools, capture context, and clean up the owned process group."""
     capture.unlink(missing_ok=True)
     with (root / "stderr.log").open("w+") as stderr:
         process = subprocess.Popen([codex, "app-server"], env=env, cwd=root,
@@ -44,10 +46,12 @@ def inspect_child(codex, env, root, capture):
         pending = bytearray()
 
         def send(message):
+            """Write one newline-delimited app-server request or notification."""
             process.stdin.write((json.dumps(message) + "\n").encode())
             process.stdin.flush()
 
         def response(request_id):
+            """Read the matching reply with a deadline, ignoring asynchronous notifications."""
             deadline = time.monotonic() + 15
             while time.monotonic() < deadline:
                 while b"\n" in pending:
@@ -96,6 +100,7 @@ def inspect_child(codex, env, root, capture):
 
 
 def main():
+    """Verify session isolation and the credential boundary through a real package install."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--codex", required=True, help="Provider Codex binary, not an ATC shim")
     parser.add_argument("--marketplace", default=".")

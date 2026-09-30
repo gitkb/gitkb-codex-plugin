@@ -16,6 +16,7 @@ PLUGIN_ROOT = Path(sys.argv.pop(1))
 
 class LaunchContract(unittest.TestCase):
     def test_parent_context_is_forwarded_by_name_only(self):
+        """Require the activity/registry allowlist while rejecting fixed environment values."""
         config = json.loads((PLUGIN_ROOT / ".mcp.json").read_text())
         self.assertEqual(set(config["mcpServers"]), {"gitkb"})
         server = config["mcpServers"]["gitkb"]
@@ -29,6 +30,7 @@ class LaunchContract(unittest.TestCase):
         self.assertEqual(server["args"], ["mcp"])
 
     def test_cache_version_changes_with_launch_contract(self):
+        """Ensure the installable version cannot reuse either pre-fix cache entry."""
         manifest = json.loads((PLUGIN_ROOT / ".codex-plugin/plugin.json").read_text())
         version = tuple(int(part) for part in manifest["version"].split("."))
         self.assertEqual(len(version), 3)
