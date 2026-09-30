@@ -15,3 +15,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y jq
       - name: Run release checks
         run: make release-check
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Codex for MCP launch regression
+        run: npm install --prefix "$RUNNER_TEMP/codex" @openai/codex@0.159.2
+      - name: Test packaged MCP launch through Codex
+        run: make test-integration CODEX_TEST_BINARY="$RUNNER_TEMP/codex/node_modules/.bin/codex"

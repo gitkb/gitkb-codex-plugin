@@ -1,9 +1,13 @@
-.PHONY: all test lint lint-json lint-policy lint-codex diff-check release-check clean
+.PHONY: all test test-integration lint lint-json lint-policy lint-codex diff-check release-check clean
 
 all: lint test
 
 test:
 	@tests/package-policy.sh
+	@python3 tests/mcp-contract.py plugin
+
+test-integration:
+	@python3 tests/mcp-startup.py --codex "$(CODEX_TEST_BINARY)"
 
 lint: lint-json lint-policy lint-codex
 	@echo "All checks passed."

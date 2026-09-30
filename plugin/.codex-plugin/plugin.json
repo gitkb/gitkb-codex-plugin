@@ -1,6 +1,6 @@
 {
   "name": "gitkb",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Codex hooks, skills, and MCP config for GitKB code-intelligence guidance.",
   "author": {
     "name": "GitKB",

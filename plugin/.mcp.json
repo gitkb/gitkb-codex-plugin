@@ -4,6 +4,16 @@
       "command": "git-kb",
       "args": [
         "mcp"
+      ],
+      "env_vars": [
+        "SESSION_ACTIVITY_RESOURCE_ID",
+        "SESSION_ACTIVITY_RESOURCE_KIND",
+        "SESSION_ACTIVITY_PROVIDER",
+        "SESSION_ACTIVITY_CONTEXT_FILE",
+        "SESSION_ACTIVITY_SINK_COMMAND",
+        "SESSION_ACTIVITY_SINK_ARGS_JSON",
+        "ATC_ROOT",
+        "ATC_CONFIG"
       ]
     }
   }
