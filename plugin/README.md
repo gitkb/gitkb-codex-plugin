@@ -54,8 +54,26 @@ git-kb init codex
 - one focused code-intelligence skill;
 - Codex lifecycle hooks that call `git-kb hook codex`;
 - MCP configuration for `git-kb mcp`;
-- no external harness-specific behavior;
+- inherited session activity context for the MCP process;
 - no vendored copy of the full canonical `git-kb init codex` skill set.
+
+## ATC Session Activity
+
+When Codex runs through an ATC shim, the plugin forwards the parent's six
+`SESSION_ACTIVITY_*` settings to `git-kb mcp`. It also forwards `ATC_ROOT` and
+`ATC_CONFIG` when set, so the activity sink uses the same registry as the shim.
+Codex filters the MCP environment; installing a newer `git-kb` or `atc` binary
+alone does not update this plugin launch configuration.
+
+Install the updated plugin (`0.1.2`) from your marketplace and restart or resume
+Codex through the ATC shim to start a new MCP process. Existing MCP processes keep
+the environment with which they started. Previously omitted activity records
+are not backfilled by this update.
+
+The configuration forwards variable names rather than fixed session values.
+Without parent activity context, GitKB keeps its normal behavior. The plugin does
+not forward API credentials, generic provider thread IDs, or a global ATC session
+ID as a substitute for the activity contract.
 
 ## Documentation
 

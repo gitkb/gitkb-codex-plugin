@@ -1,6 +1,10 @@
 # GitKB Codex Plugin
 
-This repository contains the GitKB marketplace plugin for Codex.
+This repository is the authoritative source for the GitKB Codex plugin payload
+and its package/MCP regression tests. The `gitkb/codex-plugins` marketplace references
+`./plugin` here through a Git-backed source; it does not maintain a plugin copy.
+Plugin behavior changes belong in this repository. Catalog release promotion only
+updates the marketplace's approved commit selector.
 
 GitKB gives Codex local code intelligence first: symbols, callers, callees, impact analysis, dead-code detection, semantic search, and service-edge queries through the `git-kb` CLI and MCP tools. Full GitKB setup adds the persistent knowledge graph for tasks, specs, decisions, architecture, and team sync.
 
@@ -87,3 +91,25 @@ The plugin version is declared in:
 - `plugin/.codex-plugin/plugin.json`
 
 Keep the marketplace and plugin docs aligned when preparing a release.
+
+## MCP Launch Regression Tests
+
+`make test` checks the packaged environment allowlist and cache version, and
+runs negative controls for cache symlinks, special files, executable modes,
+receipt path escapes, optimized Python, protocol failures, output limits, and
+process cleanup. Python 3.11 or newer is required for these test tools. The
+installation test exercises the actual Codex MCP launch boundary with synthetic
+sessions, custom registry settings, paths with spaces and Unicode, and credential
+canaries. It reuses an isolated plugin installation across two sessions and a
+launch without activity context. A second isolated run first installs a bundled
+`0.1.0` fixture, reproduces its missing context, then upgrades the same
+`gitkb@gitkb` installation and repeats those checks. The harness bounds protocol
+buffers and diagnostic reads, and terminates its own app-server process group.
+It does not start a model turn or run an activity sink, and it does not use your Codex home or credentials.
+
+```bash
+make test-integration CODEX_TEST_BINARY=/absolute/path/to/provider/codex
+```
+
+Pass the provider binary, rather than an ATC shim. CI runs this test with Codex
+`0.159.2`, in addition to the release checks.
