@@ -13,7 +13,7 @@ git-kb code symbols --file <path> --json
 git-kb code callers "<symbol-or-id>" --json
 git-kb code callees "<symbol-or-id>" --json
 git-kb code impact <path> --json
-git-kb ai semantic "<query>" --json
+git-kb semantic search "<query>" --json
 ```
 
 When MCP tools are enabled, prefer the matching GitKB MCP tools for structured output.
